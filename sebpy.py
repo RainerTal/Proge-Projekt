@@ -18,4 +18,4 @@ with open(fail, 'r', encoding='utf8') as f, open('andmed.csv', 'w', newline='') 
             valikud = [el.strip('"') for el in valikud]
             mainlist.append(valikud)
 
-        csv.writer(excel).writerows(mainlist)
+        #csv.writer(excel).writerows(mainlist)
