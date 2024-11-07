@@ -1,3 +1,9 @@
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
 def korista_suur_list(suur_list):
     korrastatud_list = []
     kasutu_info_indexid = [1, 3, 8, 9]
@@ -16,6 +22,29 @@ def korista_suur_list(suur_list):
         
     return loplik_list
 
+def api_call(list_korrastatud):
+    client = OpenAI(
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
+
+    chat_completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "Write system prompt here"
+            },
+            {
+                "role": "user",
+                "content": list_korrastatud,
+            }
+        ]
+    )
+    response_content = chat_completion.choices[0].message.content
+
+    return response_content
+
+
 def main():
     suur_list = []
 
@@ -24,7 +53,10 @@ def main():
             rida = rida.strip().split(",")
             suur_list.append(rida)
     
-    print(korista_suur_list(suur_list))
+    korrastatud = (korista_suur_list(suur_list))
+
+    api_res = api_call(korrastatud)
+    print(api_res)
 
 if __name__ == "__main__":
     main()
