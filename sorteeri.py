@@ -13,7 +13,7 @@
 # Probeeleme on lahendada aidanud Github Copilot, API requesti kood on kopeeritud OpenAI oma dokumentatsioonist
 #
 # Lisakommentaar (nt käivitusjuhend):
-#
+# Juhend on readme.md failis
 ##################################################
 
 import os
