@@ -1,5 +1,6 @@
 import csv
 import os
+import math
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -15,14 +16,22 @@ def api_call(list_korrastatud):
         messages=[
             {
                 "role": "system",
-                "content": """No explanations, only answers I ask for. I want you to add up all amounts and service fees. Now categorize them accordingly: 
-                groceries (konsum, coop, selver, maksimarket or any other grocery stores);
-                shopping (eeden; ülemiste; lõunakeskus; clothing stores like 24forever, h&m, nike, businesses for example OÜ, AS);
-                fuel (circleK, neste, terminal, alexela and others);
-                eating out (restoran, kohvik, pizzakiosk, mcdonalds, hesburger, chopsticks, aparaat, kolm tilli or other);
-                microtransactions (steam, google payment);
-                parking (parkla, parking, park, europark);
-                other (sent to or by other people, you can  or unknown). Let me know which ones are unknown to you."""
+                "content": """
+                No explanations, only answers I ask for.
+                 
+                Categorize ALL payments, make sure similar payments are in same category: 
+                    Toidukaubad (toidukeskus, lihapood, lidl, konsum, coop, selver, maksimarket, maxima or any other grocery stores);
+                    Tankla (circleK, neste, terminal, alexela and others);
+                    Väljas söömine (restoran, kohvik, pizzakiosk, mcdonalds, HERBURGER, chopsticks, aparaat, kolm tilli or other);
+                    Kõik internetiostud (websites, steam, gamerpay, google payment, online shopping (aliexpress, temu));
+                    Parkimine (parkla, europark, snabb);
+                    Transport (bolt, takso)
+                    Ostlemine (clothing stores like 24forever, h&m, nike sportsdirect, sportland, rademar, businesses for example OÜ, AS, malls like ülemiste, lõunakeskus);
+                    Riik/Pank (local banks such as SEB, SWED, Luminor, RAHANDUSMINISTEERIUM, ATM);
+                    Muud (apteek, sent to/recieved from other people, autokool, haridus ja kultuuriselts, doesn't categorize exactly to others)
+
+                Make a CSV compatible list where you separate categories and have payments in this form: nimi(not category),summa,kuupäev.
+                """
             },
             {
                 "role": "user",
@@ -54,5 +63,15 @@ with open(fail, 'r', encoding='utf8') as f, open('andmed.csv', 'w', newline='') 
             mainlist.append(valikud)
 
         #csv.writer(excel).writerows(mainlist)
+esimene_pool = math.ceil(len(mainlist)/2)
 
-print(api_call(mainlist))
+elist = []
+for i in range(0,esimene_pool):
+    elist += [mainlist[i]]
+tlist = []
+for i in range(esimene_pool,len(mainlist)):
+    tlist += [mainlist[i]]
+
+print(api_call(elist))
+
+print(api_call(tlist))
