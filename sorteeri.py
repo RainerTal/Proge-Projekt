@@ -13,13 +13,15 @@
 # Probeeleme on lahendada aidanud Github Copilot, API requesti kood on kopeeritud OpenAI oma dokumentatsioonist
 #
 # Lisakommentaar (nt käivitusjuhend):
-#
+# Juhend on readme.md failis
 ##################################################
 
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
-
+import matplotlib.pyplot as plt
+import pandas as pd
+ 
 load_dotenv()
 
 #Raineri poolt REVOLUT csv faili korrastamine
@@ -102,7 +104,7 @@ def api_call_REVOLUT(pool_korrastatud_list):
                 Output Requirements:
 
                 Format: CSV
-                Columns: label, date, merchant, amount, currency.
+                Columns: Kategooria, Kuupäev, Firma, Summa, Valuuta
                 Sort list Alphabetically based on label.
                 Completeness: Ensure every original transaction is included in the final CSV.
                 
@@ -170,9 +172,12 @@ def jaga_topeltlist_kaheks(korrastatud_list):
     return esimene_pool, teine_pool
 
 def kirjuta_tagasi(fail, api_response_esimene, api_response_teine):
+
+    korrastatud_esimene = api_response_esimene.replace('csv', '').replace('```', '').strip()
+    korrastatud_teine = api_response_teine.replace('csv', '').replace('```', '').replace("Kategooria,Kuupäev,Firma,Summa,Valuuta", '').strip()
+
     with open(fail, "w", encoding="utf-8") as f:
-        print(f"{api_response_esimene}", file=f)
-        print(f"{api_response_teine}", file=f)
+        print(korrastatud_esimene + "\n" + korrastatud_teine, file=f)
 
 def main():
     fail = input("Sisesta .csv faili nimi, mille sees oleks soovitud panga nimi: ")
@@ -187,8 +192,8 @@ def main():
                 api_response_esimene = api_call_SEB(esimene_pool)
                 api_response_teine = api_call_SEB(teine_pool)
 
-                kirjuta_tagasi("kirjuta.csv", api_response_esimene, api_response_teine)
-                break
+                kirjuta_tagasi("andmed.csv", api_response_esimene, api_response_teine)
+
             elif "revolut" in fail.lower():
                 revolut_list = korista_list_REVOLUT(fail)
 
@@ -197,13 +202,13 @@ def main():
                 api_response_esimene = api_call_REVOLUT(esimene_pool)
                 api_response_teine = api_call_REVOLUT(teine_pool)
 
-                kirjuta_tagasi("kirjuta.csv", api_response_esimene, api_response_teine)
-                break
+                kirjuta_tagasi("andmed.csv", api_response_esimene, api_response_teine)
             else:
                 break
+            break
         else:
-            print("Sellist faili pole, proovi uuesti")
-            fail = input("Sisesta .csv faili nimi, mille sees oleks soovitud panga nimi, ENTER, et lõpetada: ")
+            print("Sellist faili pole, proovi uuesti.")
+            fail = input("Sisesta .csv faili nimi, mille sees oleks soovitud panga nimi, 'ENTER', et lõpetada: ")
             if fail == "":
                 break
             else:
