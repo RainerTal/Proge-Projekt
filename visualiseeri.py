@@ -81,7 +81,7 @@ with pd.ExcelWriter('final.xlsx', engine='xlsxwriter') as writer:
     worksheet = writer.sheets["Kõik kulud ja tulud"]
     worksheet2 = writer.sheets["Kulude ja tulude summad"]
 
-    worksheet2.write(1, 1, "Kulude summa")
+    worksheet2.write(0, 1, "Kulude summa")
     worksheet2.write(1, 5, "Tulude summa")
 
     worksheet.insert_image('H2', pie_chart_path)  

@@ -203,8 +203,6 @@ def main():
                 api_response_teine = api_call_REVOLUT(teine_pool)
 
                 kirjuta_tagasi("andmed.csv", api_response_esimene, api_response_teine)
-            else:
-                break
             break
         else:
             print("Sellist faili pole, proovi uuesti.")
