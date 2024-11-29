@@ -20,8 +20,8 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 import tkinter
-from tkinter import Tk, PhotoImage, Label, filedialog
-from tkinter import ttk
+from tkinter import Tk, PhotoImage, filedialog
+
 
 load_dotenv()
 
@@ -138,19 +138,20 @@ def api_call_SEB(pool_korrastatud_list):
             {
                 "role": "system",
                 "content": """
-                No explanations, only answers.
+                No explanations, only answers I ask for.
                  
-                Categorize ALL payments, make sure similar payments are in same category, amount must be float: 
+                Categorize ALL payments, make sure similar payments are in same category: 
                     Toidukaubad (toidukeskus, lihapood, lidl, konsum, coop, selver, maksimarket, maxima or any other grocery stores);
                     Tankla (circleK, neste, terminal, alexela and others);
                     Väljas söömine (restoran, kohvik, pizzakiosk, mcdonalds, HERBURGER, chopsticks, aparaat, kolm tilli or other);
-                    Internet (websites, steam, gamerpay, google payment, online shopping (aliexpress, temu));
+                    Kõik internetiostud (websites, steam, gamerpay, google payment, online shopping (aliexpress, temu));
                     Parkimine (parkla, europark, snabb);
                     Transport (bolt, takso)
                     Ostlemine (clothing stores like 24forever, h&m, nike sportsdirect, sportland, rademar, businesses for example OÜ, AS, malls like ülemiste, lõunakeskus);
                     Riik/Pank (local banks such as SEB, SWED, Luminor, RAHANDUSMINISTEERIUM, ATM);
                     Muud (apteek, sent to/recieved from other people, autokool, haridus ja kultuuriselts, doesn't categorize exactly to others)
-                Make a CSV compatible list with all lines where you separate categories in these columns: category,nimi,summa,kuupäev.
+
+                Make a CSV compatible list where you separate categories and have payments in this form: nimi(not category),summa,kuupäev.
                 """
             },
             {
@@ -172,21 +173,60 @@ def jaga_topeltlist_kaheks(korrastatud_list):
     return esimene_pool, teine_pool
 
 def kirjuta_tagasi(fail, api_response_esimene, api_response_teine):
-
-    api_response_esimene = api_response_esimene.replace('csv', '').replace('```', '').strip()
-    api_response_teine = api_response_teine.replace('csv', '').replace('```', '').strip()
-
     with open(fail, "w", encoding="utf-8") as f:
         print(f"{api_response_esimene}", file=f)
         print(f"{api_response_teine}", file=f)
 
+def faili_asukoht(fail):
+    failitee = os.path.join(fail)
+    return failitee
+
+def avafail():
+    return filedialog.askopenfilename(title="Vali CSV fail", filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
+
+def run_tkinter():
+    root = Tk()
+
+    root.title("Finantside Jälgija")
+    root.configure(background="black")
+    root.eval('tk::PlaceWindow . center')
+    root.minsize(600,350)
+    root.resizable(False, False)
+
+    canvas = tkinter.Canvas(root, width=600, height=350, highlightthickness=0)
+    canvas.grid(column=1, row=1, padx=0, pady=0)
+
+    taust = PhotoImage(file="dimtaust.png")
+    canvas.create_image(0, 0, anchor="nw", image=taust)
+
+    canvas.create_text(90, 100, text="Sisesta oma panga (SEB, Revolut) kontoväljavõtte fail", 
+                    font=("Helvetica", 12, "bold"), fill="white", anchor="nw")
+
+    # Create a button on the canvas
+    button_x1, button_y1 = 250, 150  # Top-left corner
+    button_x2, button_y2 = 350, 180  # Bottom-right corner
+    button = canvas.create_rectangle(button_x1, button_y1, button_x2, button_y2, fill="cyan", outline="white")
+
+    # Create text for the button
+    canvas.create_text((button_x1 + button_x2) / 2, (button_y1 + button_y2) / 2, text="Ava fail", 
+                    font=("Helvetica", 14), fill="black")
+
+    # Function to handle button click
+    def on_button_click(event):
+        fail = faili_asukoht(avafail())
+        main(fail)
+
+    # Bind mouse click event to the button
+    canvas.tag_bind(button, "<Button-1>", on_button_click)
+
+    root.mainloop()
 
 def main(fail):
     fail1 = f"'{fail}'"
 
     while True:
-        if "csv" in fail:
-            if "kontovv.csv" in fail:
+        if "csv" in fail1:
+            if "kontovv.csv" in fail1:
                 seb_list = korista_list_SEB(fail)
 
                 esimene_pool, teine_pool = jaga_topeltlist_kaheks(seb_list)
@@ -197,7 +237,7 @@ def main(fail):
                 kirjuta_tagasi("kirjuta.csv", api_response_esimene, api_response_teine)
                 print("TEST")
                 break
-            elif "revolut" in fail.lower():
+            elif "revolut" in fail1.lower():
                 revolut_list = korista_list_REVOLUT(fail)
 
                 esimene_pool, teine_pool = jaga_topeltlist_kaheks(revolut_list)
@@ -213,48 +253,5 @@ def main(fail):
             print("Sellist faili pole, proovi uuesti")
             break
 
-
-def faili_asukoht(fail):
-    failitee = os.path.join(fail)
-    return failitee
-
-def avafail():
-    return filedialog.askopenfilename(title="Vali CSV fail", 
-                                        filetypes=[("CSV files", "*.csv"), 
-                                                    ("All files", "*.*")])
-
-root = Tk()
-
-root.title("Finantside Jälgija")
-root.configure(background="black")
-root.eval('tk::PlaceWindow . center')
-root.minsize(600,350)
-root.resizable(False, False)
-
-canvas = tkinter.Canvas(root, width=600, height=350, highlightthickness=0)
-canvas.grid(column=1, row=1, padx=0, pady=0)
-
-taust = PhotoImage(file="dimtaust.png")
-canvas.create_image(0, 0, anchor="nw", image=taust)
-
-canvas.create_text(90, 100, text="Sisesta oma panga (SEB, Revolut) kontoväljavõtte fail", 
-                font=("Helvetica", 12, "bold"), fill="white", anchor="nw")
-
-# Create a button on the canvas
-button_x1, button_y1 = 250, 150  # Top-left corner
-button_x2, button_y2 = 350, 180  # Bottom-right corner
-button = canvas.create_rectangle(button_x1, button_y1, button_x2, button_y2, fill="cyan", outline="white")
-
-# Create text for the button
-canvas.create_text((button_x1 + button_x2) / 2, (button_y1 + button_y2) / 2, text="Ava fail", 
-                font=("Helvetica", 14), fill="black")
-
-# Function to handle button click
-def on_button_click(event):
-    fail = faili_asukoht(avafail())
-    main(fail)
-
-# Bind mouse click event to the button
-canvas.tag_bind(button, "<Button-1>", on_button_click)
-
-root.mainloop()
+if __name__ == "__main__":
+    run_tkinter()
