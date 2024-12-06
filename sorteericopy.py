@@ -106,7 +106,7 @@ def api_call_REVOLUT(pool_korrastatud_list):
                 Output Requirements:
 
                 Format: CSV
-                Columns: label, date, merchant, amount, currency.
+                Columns: Kategooria, Kuupäev, Firma, Summa, Valuuta
                 Sort list Alphabetically based on label.
                 Completeness: Ensure every original transaction is included in the final CSV.
                 
@@ -174,11 +174,14 @@ def jaga_topeltlist_kaheks(korrastatud_list):
     return esimene_pool, teine_pool
 
 def kirjuta_tagasi(fail, api_response_esimene, api_response_teine):
-    with open(fail, "w", encoding="utf-8") as f:
-        print(f"{api_response_esimene}", file=f)
-        print(f"{api_response_teine}", file=f)
 
-    return "andmed.csv"
+    korrastatud_esimene = api_response_esimene.replace('csv', '').replace('```', '').strip()
+    korrastatud_teine = api_response_teine.replace('csv', '').replace('```', '').replace("Kategooria,Kuupäev,Firma,Summa,Valuuta", '').strip()
+
+    with open(fail, "w", encoding="utf-8") as f:
+        print(korrastatud_esimene + "\n" + korrastatud_teine, file=f)
+
+    return fail
 
 def visualiseeri_revolut(sisend_fail):
     fail = sisend_fail
