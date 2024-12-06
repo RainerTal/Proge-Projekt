@@ -180,9 +180,8 @@ def kirjuta_tagasi(fail, api_response_esimene, api_response_teine):
 
     return "andmed.csv"
 
-def visualiseeri_revolut(sisend_fail, väljund_fail):
+def visualiseeri_revolut(sisend_fail):
     fail = sisend_fail
-    output_fail = väljund_fail
 
     loe_andmed = pd.read_csv(fail)
 
@@ -398,7 +397,7 @@ def main(fail):
             api_response_teine = api_call_REVOLUT(teine_pool)
 
             sisend_fail = kirjuta_tagasi("kirjuta.csv", api_response_esimene, api_response_teine)
-            visualiseeri_revolut(sisend_fail, "final.xlsx")
+            visualiseeri_revolut(sisend_fail)
     else:
         print("Sellist faili pole, proovi uuesti")
 
