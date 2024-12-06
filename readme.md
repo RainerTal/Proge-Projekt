@@ -15,3 +15,9 @@ Siis saab programmi käivitada ja tuleb sisestada oma panga väljavõte hetkel, 
 Programm jagab vastavad kulud kategooriatesse ning hetkel kirjutab need tagasi 'kirjuta.csv' faili.
 
 Edaspidi töötame nende andmete visualiseerimisega
+
+-    Käivita sorteerycopy.py
+Kui programm on töö lõpetanud, siis
+    Käivita sektor.py
+
+ui.py on test hetkel
