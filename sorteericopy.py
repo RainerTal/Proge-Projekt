@@ -144,11 +144,14 @@ def api_call_SEB(pool_korrastatud_list):
                 "role": "system",
                 "content": """
                 No explanations, only answers I ask for.
+                No explanations, only answers I ask for.
                  
+                Categorize ALL payments, make sure similar payments are in same category: 
                 Categorize ALL payments, make sure similar payments are in same category: 
                     Toidukaubad (toidukeskus, lihapood, lidl, konsum, coop, selver, maksimarket, maxima or any other grocery stores);
                     Tankla (circleK, neste, terminal, alexela and others);
                     Väljas söömine (restoran, kohvik, pizzakiosk, mcdonalds, HERBURGER, chopsticks, aparaat, kolm tilli or other);
+                    Kõik internetiostud (websites, steam, gamerpay, google payment, online shopping (aliexpress, temu));
                     Kõik internetiostud (websites, steam, gamerpay, google payment, online shopping (aliexpress, temu));
                     Parkimine (parkla, europark, snabb);
                     Transport (bolt, takso)
