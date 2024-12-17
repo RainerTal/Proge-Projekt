@@ -183,10 +183,16 @@ def kirjuta_tagasi(fail, api_response_esimene, api_response_teine):
 
     return fail
 
-def visualiseeri_revolut(sisend_fail):
-    fail = sisend_fail
+def loo_exceli_fail(fail='final.xlsx'):
+    df = pd.DataFrame()
 
-    loe_andmed = pd.read_csv(fail)
+    df.to_excel(fail, engine='openpyxl')
+    return fail
+
+
+def visualiseeri_revolut(sisend_fail):
+
+    loe_andmed = pd.read_csv(sisend_fail)
 
     # Kuupäevad str -> kuupäev | Summad str -> num
 
@@ -253,6 +259,8 @@ def visualiseeri_revolut(sisend_fail):
     plt.close()
 
     # Kõik exceli faili tagasi kirjutamine
+    if not os.path.exists('final.xlsx'):
+        loo_exceli_fail()
 
     with pd.ExcelWriter('final.xlsx', engine='xlsxwriter') as writer:
         sorteeritud_andmed.to_excel(writer, sheet_name="Kõik kulud ja tulud", index=False)
@@ -286,21 +294,17 @@ def run_tkinter():
             self.minsize(600, 300)
             self.resizable(False, False)
 
-            # Create a container for all pages
             container = tkinter.Frame(self)
             container.pack(fill="both", expand=True)
 
-            # Dictionary to hold the pages
             self.frames = {}
 
-            # Add pages to the dictionary
-            for Leht in (Algus_leht, Loading_leht, Lopp_leht):
+            for Leht in (Algus_leht, Laadimise_leht, Lopp_leht):
                 page_name = Leht.__name__
                 frame = Leht(parent=container, controller=self)
                 self.frames[page_name] = frame
-                frame.grid(row=0, column=0, sticky="nsew")  # Stack all pages
+                frame.grid(row=0, column=0, sticky="nsew")
 
-            # Show the first page
             self.show_page("Algus_leht")
 
         def show_page(self, page_name):
@@ -312,48 +316,41 @@ def run_tkinter():
             super().__init__(parent)
             self.controller = controller
 
-            # Canvas setup for Page 1
             canvas = tkinter.Canvas(self, width=600, height=300, highlightthickness=0)
             canvas.pack(fill="both", expand=True)
 
-            # Background image
             self.taust = PhotoImage(file="dimtaust.png")
             canvas.create_image(0, 0, anchor="nw", image=self.taust)
 
-            # Instructions text
             canvas.create_text(300, 100, text="Sisesta oma panga (SEB, Revolut) kontoväljavõtte fail", font=("Helvetica", 12, "bold"), fill="white", anchor="center")
 
-            # Button on canvas
-            button_x1, button_y1 = 250, 150  # Top-left corner
-            button_x2, button_y2 = 350, 180  # Bottom-right corner
+            button_x1, button_y1 = 250, 150
+            button_x2, button_y2 = 350, 180
             button = canvas.create_rectangle(button_x1, button_y1, button_x2, button_y2, fill="cyan", outline="white")
-
-            # Button text
             canvas.create_text((button_x1 + button_x2) / 2, (button_y1 + button_y2) / 2, text="Ava fail", font=("Helvetica", 14), fill="black")
 
-            # Function to handle button click
-            def on_button_click(event):
-                controller.show_page("Loading_leht")
+            def on_button_click(_):
                 fail = faili_asukoht(avafail())
+                self.controller.show_page("Laadimise_leht")
+                self.controller.update()
                 main(fail)
-                controller.show_page("Lopp_leht")
+                self.controller.show_page("Lopp_leht")
 
-            # Bind the button to click event
             canvas.tag_bind(button, "<Button-1>", on_button_click)
 
-    class Loading_leht(tkinter.Frame):
+    class Laadimise_leht(tkinter.Frame):
         def __init__(self, parent, controller):
             super().__init__(parent)
             self.controller = controller
+            
+            self.canvas = tkinter.Canvas(self, width=600, height=350, highlightthickness=0)
+            self.canvas.pack(fill="both", expand=True)
 
-            canvas = tkinter.Canvas(self, width=600, height=350, highlightthickness=0)
-            canvas.pack(fill="both", expand=True)
+            self.background = PhotoImage(file="dimtaust.png")
+            self.canvas.create_image(0, 0, anchor="nw", image=self.background)
 
-            self.taust = PhotoImage(file="dimtaust.png")
-            canvas.create_image(0, 0, anchor="nw", image=self.taust)
-
-            # Loading text
-            canvas.create_text(300, 150, text="Andmete töötlemine...", font=("Helvetica", 18, "bold"), fill="white", anchor="center")
+            self.canvas.create_text(300, 150, text="Andmete töötlemine...", 
+                                  font=("Helvetica", 16, "bold"), fill="white", anchor="center")
 
     class Lopp_leht(tkinter.Frame):
         def __init__(self, parent, controller) -> None:
@@ -367,15 +364,15 @@ def run_tkinter():
             canvas.create_image(0, 0, anchor="nw", image=self.taust)
 
             canvas.create_text(300, 150, text="Tulemused leiad failist final.xlsx", font=("Helvetica", 18, "bold"), fill="white", anchor="center")
-            # Exit button
-            button_x1, button_y1 = 250, 200  # Top-left corner
-            button_x2, button_y2 = 350, 230  # Bottom-right corner
+            button_x1, button_y1 = 250, 200  
+            button_x2, button_y2 = 350, 230  
             button = canvas.create_rectangle(button_x1, button_y1, button_x2, button_y2, fill="cyan", outline="white")
             canvas.create_text((button_x1 + button_x2) / 2, (button_y1 + button_y2) / 2, text="Lõpeta", font=("Helvetica", 14), fill="black")
             canvas.tag_bind(button, "<Button-1>", lambda event: controller.destroy())
 
     app = PageSwitcherApp()
     app.mainloop()
+
 
 def main(fail):
     fail1 = f"'{fail}'"
