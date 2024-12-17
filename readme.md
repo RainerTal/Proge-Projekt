@@ -2,7 +2,7 @@
 
 Enne programmi kävitamist on vaja Pythoni teeke openai ja dotenv
 ```
-pip install openai dotenv
+pip install -r req.txt
 ```
 
 Peale seda on vaja luua endale .env fail oma arvutisse ning sinna sisse panna OpenAI API võti kujul
