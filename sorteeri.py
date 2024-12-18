@@ -16,13 +16,17 @@
 # Juhend on readme.md failis
 ##################################################
 
-import os
+import os   # Windows Startfile
+import platform # OpSys teadasaamine
 from openai import OpenAI
 from dotenv import load_dotenv
 import tkinter
 from tkinter import Tk, PhotoImage, filedialog
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # Graafikud
+import threading # Laadimise ja AI samaaegne käimine
+import math # Laadimise ring
+import subprocess # Mac ja Linux faili avamine
 
 load_dotenv()
 
@@ -79,7 +83,7 @@ def api_call_REVOLUT(pool_korrastatud_list):
     )
 
     chat_completion = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[
             {
                 "role": "system",
@@ -134,13 +138,13 @@ def api_call_SEB(pool_korrastatud_list):
     )
 
     chat_completion = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[
             {
                 "role": "system",
                 "content": """
                 No explanations, only answers I ask for.
-                 
+
                 Categorize ALL payments, make sure similar payments are in same category: 
                     Toidukaubad (toidukeskus, lihapood, lidl, konsum, coop, selver, maksimarket, maxima or any other grocery stores);
                     Tankla (circleK, neste, terminal, alexela and others);
@@ -152,7 +156,7 @@ def api_call_SEB(pool_korrastatud_list):
                     Riik/Pank (local banks such as SEB, SWED, Luminor, RAHANDUSMINISTEERIUM, ATM);
                     Muud (apteek, sent to/recieved from other people, autokool, haridus ja kultuuriselts, doesn't categorize exactly to others)
 
-                Make a CSV compatible list where you separate categories and have payments in this form: nimi(not category),summa,kuupäev.
+                Make a CSV compatible list with label Kategooria,Kuupäev,Firma,Summa,Valuuta. Firma should be as short as possible. Summa should be negative (-). Separate categories and have all payments in this form: Tankla,25.08.2024,CIRCLE K TARTU,-12.38,EUR
                 """
             },
             {
@@ -190,8 +194,7 @@ def loo_exceli_fail(fail='final.xlsx'):
     return fail
 
 
-def visualiseeri_revolut(sisend_fail):
-
+def visualiseerimine(sisend_fail):
     loe_andmed = pd.read_csv(sisend_fail)
 
     # Kuupäevad str -> kuupäev | Summad str -> num
@@ -211,9 +214,9 @@ def visualiseeri_revolut(sisend_fail):
     tulude_summad = tulude_summad[['Kategooria', 'Summa', 'Valuuta']]
 
 
-    # Vahelduvus suurte ja väikeste kulude kategooriate vahel, et pie chart oleks loetavam
+    # Vahelduvus suurte ja väikeste (<5% tervikust) kulude kategooriate vahel, et pie chart oleks loetavam
     kokku = kulude_summad['Summa'].sum()
-    vaiksed_threshold = kokku * 0.02
+    vaiksed_threshold = kokku * 0.05
 
     suured_kategooriad = kulude_summad[kulude_summad['Summa'] >= vaiksed_threshold]
     vaiksed_kategooriad = kulude_summad[kulude_summad['Summa'] < vaiksed_threshold]
@@ -230,7 +233,6 @@ def visualiseeri_revolut(sisend_fail):
     vahelduvus = pd.DataFrame(vahelduvus)
 
     # Pie charti genereerimine
-
     suurus = vahelduvus['Summa']
     kategooria = vahelduvus['Kategooria']
 
@@ -246,7 +248,6 @@ def visualiseeri_revolut(sisend_fail):
     kulud['Kokku kulutus'] = kulud['Summa'].cumsum().abs()
 
     # Trend charti genereerimine
-
     plt.figure(figsize=(8, 6.5))
     trend_chart_path = 'trend_chart.png'
     plt.plot(kulud['Kuupäev'], kulud['Kokku kulutus'], marker='o', linestyle='-', linewidth=2)
@@ -319,7 +320,7 @@ def run_tkinter():
             canvas = tkinter.Canvas(self, width=600, height=300, highlightthickness=0)
             canvas.pack(fill="both", expand=True)
 
-            self.taust = PhotoImage(file="dimtaust.png")
+            self.taust = PhotoImage(file="taust/dimtaust.png")
             canvas.create_image(0, 0, anchor="nw", image=self.taust)
 
             #Esimese lehe sisu
@@ -330,13 +331,19 @@ def run_tkinter():
             button = canvas.create_rectangle(button_x1, button_y1, button_x2, button_y2, fill="cyan", outline="white")
             canvas.create_text((button_x1 + button_x2) / 2, (button_y1 + button_y2) / 2, text="Ava fail", font=("Helvetica", 14), fill="black")
 
+            def main_alustamine(self, fail):
+                main(fail)
+                # Pärast maini lõpetamist läheb lõpu lehele
+                self.controller.after(0, lambda: self.controller.show_page("Lopp_leht"))
+
             def on_button_click(_):
                 fail = faili_asukoht(avafail())
                 self.controller.show_page("Laadimise_leht")
                 self.controller.update()
-                main(fail)
-                self.controller.show_page("Lopp_leht")
 
+                thread = threading.Thread(target=main_alustamine, args=(self,fail))
+                thread.start()
+            
             canvas.tag_bind(button, "<Button-1>", on_button_click)
 
     class Laadimise_leht(tkinter.Frame):
@@ -347,10 +354,37 @@ def run_tkinter():
             self.canvas = tkinter.Canvas(self, width=600, height=350, highlightthickness=0)
             self.canvas.pack(fill="both", expand=True)
 
-            self.background = PhotoImage(file="dimtaust.png")
+            self.background = PhotoImage(file="taust/dimtaust.png")
             self.canvas.create_image(0, 0, anchor="nw", image=self.background)
-            #Laadimise lehe sisu
-            self.canvas.create_text(300, 150, text="Andmete töötlemine...", font=("Helvetica", 16, "bold"), fill="white", anchor="center")
+
+            self.tekst= self.canvas.create_text(300, 130, text="Andmete töötlemine...", font=("Helvetica", 16, "bold"), fill="white", anchor="center")
+
+            # Laadimise täpid
+            self.angle = 0
+            self.loading_dots = []
+            center_x, center_y = 300, 200
+            radius = 30
+            for i in range(8):
+                angle = math.radians(i * 45)
+                x = center_x + radius * math.cos(angle)
+                y = center_y + radius * math.sin(angle)
+                dot = self.canvas.create_oval(x-3, y-3, x+3, y+3, fill='white')
+                self.loading_dots.append(dot)
+            
+            self.animate_loading()
+
+        #Laadimise animatsioon
+        def animate_loading(self):
+            try:
+                for i, dot in enumerate(self.loading_dots):
+                    angle = math.radians(self.angle + i * 45)
+                    opacity = (math.sin(angle) + 1) / 2
+                    color = f'#{int(opacity * 255):02x}{int(opacity * 255):02x}{int(opacity * 255):02x}'
+                    self.canvas.itemconfig(dot, fill=color)
+                self.angle += 10
+                self.after(50, self.animate_loading)
+            except tkinter.TclError:
+                pass
 
     class Lopp_leht(tkinter.Frame):
         def __init__(self, parent, controller) -> None:
@@ -360,20 +394,32 @@ def run_tkinter():
             canvas = tkinter.Canvas(self, width=600, height=350, highlightthickness=0)
             canvas.pack(fill="both", expand=True)
 
-            self.taust = PhotoImage(file="dimtaust.png")
+            self.taust = PhotoImage(file="taust/dimtaust.png")
             canvas.create_image(0, 0, anchor="nw", image=self.taust)
 
+            def nupuvajutus(event):
+                controller.destroy()
+                ava_final()
+
             # Viimase lehe sisu
-            canvas.create_text(300, 150, text="Tulemused leiad failist final.xlsx", font=("Helvetica", 18, "bold"), fill="white", anchor="center")
+            canvas.create_text(300, 150, text="Tulemused leiad vajutades nupule", font=("Helvetica", 18, "bold"), fill="white", anchor="center")
             button_x1, button_y1 = 250, 200  
             button_x2, button_y2 = 350, 230  
             button = canvas.create_rectangle(button_x1, button_y1, button_x2, button_y2, fill="cyan", outline="white")
             canvas.create_text((button_x1 + button_x2) / 2, (button_y1 + button_y2) / 2, text="Lõpeta", font=("Helvetica", 14), fill="black")
-            canvas.tag_bind(button, "<Button-1>", lambda event: controller.destroy())
+            canvas.tag_bind(button, "<Button-1>", nupuvajutus)
 
     app = PageSwitcherApp()
     app.mainloop()
 
+def ava_final():
+    opsys = platform.system()
+    if opsys == 'Windows':
+        os.startfile('final.xlsx')
+    elif opsys == 'Darwin':
+        subprocess.run(['open', 'final.xlsx'])
+    elif opsys == 'Linux':
+        subprocess.run(['xdg-open', 'final.xlsx'])
 
 def main(fail):
     fail1 = f"'{fail}'"
@@ -387,8 +433,9 @@ def main(fail):
             api_response_esimene = api_call_SEB(esimene_pool)
             api_response_teine = api_call_SEB(teine_pool)
 
-            kirjuta_tagasi("kirjuta.csv", api_response_esimene, api_response_teine)
-            print("TEST")
+            sisend_fail = kirjuta_tagasi("kirjuta.csv", api_response_esimene, api_response_teine)
+            visualiseerimine(sisend_fail)
+
         elif "revolut" in fail1.lower():
             revolut_list = korista_list_REVOLUT(fail)
 
@@ -398,7 +445,7 @@ def main(fail):
             api_response_teine = api_call_REVOLUT(teine_pool)
 
             sisend_fail = kirjuta_tagasi("kirjuta.csv", api_response_esimene, api_response_teine)
-            visualiseeri_revolut(sisend_fail)
+            visualiseerimine(sisend_fail)
     else:
         print("Sellist faili pole, proovi uuesti")
 

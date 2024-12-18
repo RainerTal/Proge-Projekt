@@ -1,6 +1,6 @@
 # OpenAI abiga töötav finantside jälgija
 
-Enne programmi kävitamist on vaja Pythoni teeke openai ja dotenv
+Enne programmi kävitamist on vaja Pythoni teeke openai, dotenv, pandas ja matplotlib
 ```
 pip install -r req.txt
 ```
@@ -12,12 +12,6 @@ OPENAI_API_KEY="siia_oma_võti"
 
 Siis saab programmi käivitada ja tuleb sisestada oma panga väljavõte hetkel, kas SEB-st või Revolutist
 
-Programm jagab vastavad kulud kategooriatesse ning hetkel kirjutab need tagasi 'kirjuta.csv' faili.
+Programm jagab vastavad kulud kategooriatesse ning kirjutab need csv formaadis tagasi 'kirjuta.csv' faili
 
-Edaspidi töötame nende andmete visualiseerimisega
-
--    Käivita sorteerycopy.py
-Kui programm on töö lõpetanud, siis
-    Käivita sektor.py
-
-ui.py on test hetkel
+Siis võtab programm ette antud 'kirjuta.csv' faili ning OpenAI API päring jagab kulud kategooriatesse ning matplotlib ja pandas teekide abil visualiseerib andmed 'final.xlsx' faili
