@@ -14,4 +14,4 @@ Siis saab programmi käivitada ja tuleb sisestada oma panga väljavõte hetkel, 
 
 Programm jagab vastavad kulud kategooriatesse ning kirjutab need csv formaadis tagasi 'kirjuta.csv' faili
 
-Siis võtab programm ette antud 'kirjuta.csv' faili ning OpenAI API päring jagab kulud kategooriatesse ning matplotlib ja pandas teekide abil visualiseerib andmed 'final.xlsx' faili
+Siis võtab programm ette antud 'kirjuta.csv' faili ning OpenAI API päring jagab kulud kategooriatesse. Matplotlib ja Pandas teekidega visualiseerib programm andmed faili 'final.xlsx'
