@@ -23,6 +23,9 @@ import tkinter
 from tkinter import Tk, PhotoImage, filedialog
 import pandas as pd
 import matplotlib.pyplot as plt
+import math
+import time
+import threading
 
 load_dotenv()
 
@@ -294,17 +297,21 @@ def run_tkinter():
             self.minsize(600, 300)
             self.resizable(False, False)
 
+            # Create a container for all pages
             container = tkinter.Frame(self)
             container.pack(fill="both", expand=True)
 
+            # Dictionary to hold the pages
             self.frames = {}
 
+            # Add pages to the dictionary
             for Leht in (Algus_leht, Laadimise_leht, Lopp_leht):
                 page_name = Leht.__name__
                 frame = Leht(parent=container, controller=self)
                 self.frames[page_name] = frame
-                frame.grid(row=0, column=0, sticky="nsew")
+                frame.grid(row=0, column=0, sticky="nsew")  # Stack all pages
 
+            # Show the first page
             self.show_page("Algus_leht")
 
         def show_page(self, page_name):
@@ -316,26 +323,43 @@ def run_tkinter():
             super().__init__(parent)
             self.controller = controller
 
+            # Canvas setup for Page 1
             canvas = tkinter.Canvas(self, width=600, height=300, highlightthickness=0)
             canvas.pack(fill="both", expand=True)
 
+            # Background image
             self.taust = PhotoImage(file="dimtaust.png")
             canvas.create_image(0, 0, anchor="nw", image=self.taust)
 
+            # Instructions text
             canvas.create_text(300, 100, text="Sisesta oma panga (SEB, Revolut) kontoväljavõtte fail", font=("Helvetica", 12, "bold"), fill="white", anchor="center")
 
-            button_x1, button_y1 = 250, 150
-            button_x2, button_y2 = 350, 180
+            # Button on canvas
+            button_x1, button_y1 = 250, 150  # Top-left corner
+            button_x2, button_y2 = 350, 180  # Bottom-right corner
             button = canvas.create_rectangle(button_x1, button_y1, button_x2, button_y2, fill="cyan", outline="white")
+
+            # Button text
             canvas.create_text((button_x1 + button_x2) / 2, (button_y1 + button_y2) / 2, text="Ava fail", font=("Helvetica", 14), fill="black")
 
-            def on_button_click(_):
+            # Function to handle button click
+            def on_button_click(event):
                 fail = faili_asukoht(avafail())
-                self.controller.show_page("Laadimise_leht")
-                self.controller.update()
-                main(fail)
-                self.controller.show_page("Lopp_leht")
 
+                self.controller.show_page("Laadimise_leht")
+                
+                def process():
+                    try:
+                        main(fail)
+                        self.controller.show_page("Lopp_leht")
+                    except Exception as e:
+                        print(f"Processing error: {e}")
+
+                thread = threading.Thread(target=process)
+                thread.daemon = True
+                thread.start()
+
+            # Bind the button to click event
             canvas.tag_bind(button, "<Button-1>", on_button_click)
 
     class Laadimise_leht(tkinter.Frame):
@@ -349,8 +373,32 @@ def run_tkinter():
             self.background = PhotoImage(file="dimtaust.png")
             self.canvas.create_image(0, 0, anchor="nw", image=self.background)
 
-            self.canvas.create_text(300, 150, text="Andmete töötlemine...", 
-                                  font=("Helvetica", 16, "bold"), fill="white", anchor="center")
+            # Create loading circle
+            self.angle = 0
+            self.loading_dots = []
+            center_x, center_y = 300, 150
+            radius = 30
+            for i in range(8):
+                angle = math.radians(i * 45)
+                x = center_x + radius * math.cos(angle)
+                y = center_y + radius * math.sin(angle)
+                dot = self.canvas.create_oval(x-3, y-3, x+3, y+3, fill='white')
+                self.loading_dots.append(dot)
+            
+            self.animate_loading()
+
+        def animate_loading(self):
+            try:
+                for i, dot in enumerate(self.loading_dots):
+                    angle = math.radians(self.angle + i * 45)
+                    opacity = (math.sin(angle) + 1) / 2
+                    color = f'#{int(opacity * 255):02x}{int(opacity * 255):02x}{int(opacity * 255):02x}'
+                    self.canvas.itemconfig(dot, fill=color)
+                self.angle += 10
+                self.after(50, self.animate_loading)
+            except tkinter.TclError:
+                # Handle case where window is closed
+                pass
 
     class Lopp_leht(tkinter.Frame):
         def __init__(self, parent, controller) -> None:
@@ -364,8 +412,9 @@ def run_tkinter():
             canvas.create_image(0, 0, anchor="nw", image=self.taust)
 
             canvas.create_text(300, 150, text="Tulemused leiad failist final.xlsx", font=("Helvetica", 18, "bold"), fill="white", anchor="center")
-            button_x1, button_y1 = 250, 200  
-            button_x2, button_y2 = 350, 230  
+            # Exit button
+            button_x1, button_y1 = 250, 200  # Top-left corner
+            button_x2, button_y2 = 350, 230  # Bottom-right corner
             button = canvas.create_rectangle(button_x1, button_y1, button_x2, button_y2, fill="cyan", outline="white")
             canvas.create_text((button_x1 + button_x2) / 2, (button_y1 + button_y2) / 2, text="Lõpeta", font=("Helvetica", 14), fill="black")
             canvas.tag_bind(button, "<Button-1>", lambda event: controller.destroy())
