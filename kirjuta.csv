@@ -2,10 +2,6 @@ Kategooria,Kuupäev,Firma,Summa,Valuuta
 Baarid,2024-10-12 23:39:10,Möku,-4.00,EUR
 Baarid,2024-10-13 00:52:45,Labor Baar,-28.00,EUR
 Kütus,2024-10-12 22:44:58,Circle K Gas Station,-1.49,EUR
-Sissetulekud,2024-10-03 18:00:18,Apple Pay Top-Up by *9481,100.00,EUR
-Sissetulekud,2024-10-12 21:08:25,Apple Pay Top-Up by *9481,50.00,EUR
-Sissetulekud,2024-10-13 18:11:42,Apple Pay Top-Up by *9481,100.00,EUR
-Sissetulekud,2024-10-15 00:51:09,Apple Pay Top-Up by *9481,2050.00,EUR
 Toidukaubad,2024-09-30 14:06:41,Selver,-3.49,EUR
 Toidukaubad,2024-09-30 09:52:42,Selver,-2.51,EUR
 Toidukaubad,2024-10-01 19:38:02,Raatuse Selver ABC,-17.79,EUR
@@ -28,28 +24,36 @@ Transport,2024-10-08 10:07:22,Bolt,-0.53,EUR
 Transport,2024-10-13 18:13:23,Bolt,-0.61,EUR
 Transport,2024-10-14 16:14:44,Bolt,-0.58,EUR
 Valuuta vahetus,2024-10-05 22:12:53,Exchanged to USD,-10.00,EUR
+Valuuta vahetus,2024-10-15 00:54:53,Exchanged to USD,-2020.00,EUR
 Väljas söömine,2024-10-03 13:45:17,Delta Kohvik,-8.90,EUR
 Väljas söömine,2024-10-04 16:26:47,Picu Darbnīca,-9.10,EUR
 Väljas söömine,2024-10-07 22:37:30,Hesburger,-7.00,EUR
 Väljas söömine,2024-10-13 02:33:58,Hesburger,-9.10,EUR
+Sissetulekud,2024-10-03 18:00:18,Apple Pay Top-Up by *9481,100.00,EUR
+Sissetulekud,2024-10-12 21:08:25,Apple Pay Top-Up by *9481,50.00,EUR
+Sissetulekud,2024-10-13 18:11:42,Apple Pay Top-Up by *9481,100.00,EUR
+Sissetulekud,2024-10-15 00:51:09,Apple Pay Top-Up by *9481,2050.00,EUR
 Baarid,2024-10-31 23:20:33,Mits Halloween,-5.00,EUR
 Baarid,2024-11-01 01:06:57,Mits Halloween,-10.00,EUR
 Baarid,2024-11-01 01:17:48,Mits Halloween,-3.00,EUR
 Baarid,2024-11-01 02:05:00,Mits Halloween,-6.00,EUR
 Microtransactions,2024-10-19 23:18:48,Twitch,-4.99,EUR
-Ostlemine,2024-10-25 18:30:04,Rl Fashions Of Europe,-56.00,EUR
-Ostlemine,2024-10-25 19:36:09,Foot Locker,-43.00,EUR
 Ostlemine,2024-10-25 10:23:40,KLICK | Tallinn | Lennujaam,-19.99,EUR
+Ostlemine,2024-10-25 19:36:09,Foot Locker,-43.00,EUR
+Ostlemine,2024-10-25 18:30:04,Rl Fashions Of Europe,-56.00,EUR
 Parkimine,2024-10-25 16:20:15,ATM - Azienda Trasporti Milanesi,-2.20,EUR
 Parkimine,2024-10-26 12:44:54,ATM - Azienda Trasporti Milanesi,-2.20,EUR
+Reisimine,2024-10-26 13:48:39,Autodromo Nazionale Monza,-11.00,EUR
+Reisimine,2024-10-26 18:00:44,Autodromo Nazionale Monza,-6.00,EUR
+Reisimine,2024-10-27 18:48:51,Ryanair,-9.00,EUR
 Sissetulekud,2024-10-23 21:05:36,Apple Pay Top-Up by *9481,100.00,EUR
 Sissetulekud,2024-10-25 10:26:24,Apple Pay Top-Up by *9481,100.00,EUR
 Sissetulekud,2024-10-25 19:50:57,Apple Pay Top-Up by *9481,200.00,EUR
 Toidukaubad,2024-10-21 16:45:55,Raatuse Selver ABC,-24.95,EUR
 Toidukaubad,2024-10-23 21:16:35,Raatuse Selver ABC,-26.06,EUR
 Toidukaubad,2024-10-24 19:21:00,Selver,-6.27,EUR
-Toidukaubad,2024-10-25 21:53:31,Carrefour,-38.08,EUR
 Toidukaubad,2024-10-25 10:22:02,R-Kiosk,-7.50,EUR
+Toidukaubad,2024-10-25 21:53:31,Carrefour,-38.08,EUR
 Toidukaubad,2024-10-29 07:50:42,Prisma,-6.13,EUR
 Toidukaubad,2024-10-30 13:34:25,Raatuse Selver ABC,-52.48,EUR
 Toidukaubad,2024-10-31 17:50:28,Raatuse Selver ABC,-27.56,EUR
@@ -60,9 +64,6 @@ Transport,2024-11-01 03:04:20,Bolt,-0.48,EUR
 Transport,2024-11-04 17:02:02,Bolt,-0.61,EUR
 Transport,2024-10-25 15:05:41,Terravision,-12.00,EUR
 Transport,2024-10-25 20:12:59,Trenitalia,-5.10,EUR
-Reisimine,2024-10-26 13:48:39,Autodromo Nazionale Monza,-11.00,EUR
-Reisimine,2024-10-26 18:00:44,Autodromo Nazionale Monza,-6.00,EUR
-Reisimine,2024-10-27 18:48:51,Ryanair,-9.00,EUR
-Väljas söömine,2024-10-28 12:25:23,McDonald's,-15.10,EUR
 Väljas söömine,2024-10-27 14:18:06,Ristogest,-22.50,EUR
+Väljas söömine,2024-10-28 12:25:23,McDonald's,-15.10,EUR
 Väljas söömine,2024-10-28 15:35:26,Wagamama,-29.50,EUR
