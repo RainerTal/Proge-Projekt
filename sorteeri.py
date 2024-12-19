@@ -138,7 +138,7 @@ def api_call_SEB(pool_korrastatud_list):
     )
 
     chat_completion = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
@@ -156,7 +156,9 @@ def api_call_SEB(pool_korrastatud_list):
                     Riik/Pank (local banks such as SEB, SWED, Luminor, RAHANDUSMINISTEERIUM, ATM);
                     Muud (apteek, sent to/recieved from other people, autokool, haridus ja kultuuriselts, doesn't categorize exactly to others)
 
-                Make a CSV compatible list with label Kategooria,Kuupäev,Firma,Summa,Valuuta. Firma should be as short as possible. Summa should be negative (-). Separate categories and have all payments in this form: Tankla,25.08.2024,CIRCLE K TARTU,-12.38,EUR
+                Make a CSV compatible list with this label: Kategooria,Kuupäev,Firma,Summa,Valuuta.
+                Firma should be as short as possible. Summa should be negative (-). 
+                Separate categories and have all payments in this form: Tankla,25.08.2024,CIRCLE K TARTU,-12.38,EUR
                 """
             },
             {
